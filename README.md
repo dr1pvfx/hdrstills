@@ -2,7 +2,15 @@
 
 A simple GUI application for converting images with PQ (Perceptual Quantizer) color space using ImageMagick.
 
+EXPERIMENTAL STUFF -- NO GUARANTEES -- MIGHT SET YOUR MACBOOK ON FIRE - I DONT TAKE ANY RESPONISIBILITY 
+
 Experimental, we are supposed to use CICP tags instead , but thats not well supported yet, so embedding a ICC profile seems to be the most reliable way 
+
+##
+added the .zip file that contains a built macos .app   just download that if you dont want to bother with the code. 
+
+
+
 
 ## Prerequisites
 
