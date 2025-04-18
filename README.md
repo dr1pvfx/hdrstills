@@ -2,6 +2,8 @@
 
 A simple GUI application for converting images with PQ (Perceptual Quantizer) color space using ImageMagick.
 
+Experimental, we are supposed to use CICP tags instead , but thats not well supported yet, so embedding a ICC profile seems to be the most reliable way 
+
 ## Prerequisites
 
 Before building the application, you need to have the following installed:
@@ -27,15 +29,15 @@ Before building the application, you need to have the following installed:
 ## Usage
 
 1. Double-click the `pq_converter.app` to launch the application
-2. Click "Browse" to select an input TIFF file
-3. The output path will be automatically set, but you can change it by clicking the output "Browse" button
+2. Click "Browse" to select an input file
+3. The output path will be automatically set, same path as source but with _hdr appended to the filename
 4. Click "Convert" to process the image
 5. The converted image will be saved with the specified output path
 
 ## Features
 
 - Simple and intuitive GUI interface
-- Support for TIFF input files
+- Support for all kinds of input files 
 - Automatic output path suggestion
 - Progress feedback and error handling
 - Built-in ICC profile for PQ color space conversion 
