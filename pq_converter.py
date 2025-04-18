@@ -9,11 +9,15 @@ class PQConverterApp:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("🔥 HDR Image Converter 🔥")
-        self.root.geometry("500x300")
+        self.root.geometry("500x350")  # Made taller for the new button
         self.root.configure(bg='#1a1a1a')  # Dark background
         
         # Get the path to the ICC profile
-        self.icc_profile = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ITUR_2100_PQ_FULL.ICC")
+        self.default_icc = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ITUR_2100_PQ_FULL.ICC")
+        self.current_icc = self.default_icc
+        
+        # Get ImageMagick path
+        self.magick_path = self.get_magick_path()
         
         # Check HEIC support
         self.check_heic_support()
@@ -21,10 +25,27 @@ class PQConverterApp:
         # Create and pack widgets
         self.create_widgets()
         
+    def get_magick_path(self):
+        # Try to find ImageMagick in common locations
+        possible_paths = [
+            "/usr/local/bin/magick",  # Homebrew default
+            "/opt/homebrew/bin/magick",  # Apple Silicon Homebrew
+            "magick"  # Fallback to PATH
+        ]
+        
+        for path in possible_paths:
+            try:
+                subprocess.run([path, "-version"], capture_output=True, check=True)
+                return path
+            except (subprocess.SubprocessError, FileNotFoundError):
+                continue
+                
+        return "magick"  # Fallback to PATH
+        
     def check_heic_support(self):
         try:
             # Check if ImageMagick has HEIC support
-            result = subprocess.run(["magick", "-list", "format"], capture_output=True, text=True)
+            result = subprocess.run([self.magick_path, "-list", "format"], capture_output=True, text=True)
             self.heic_supported = "HEIC" in result.stdout
         except Exception:
             self.heic_supported = False
@@ -57,6 +78,31 @@ class PQConverterApp:
         )
         subtitle_label.pack(pady=5)
         
+        # ICC Profile Button
+        self.icc_frame = tk.Frame(self.root, bg='#1a1a1a')
+        self.icc_frame.pack(pady=10)
+        
+        self.icc_button = tk.Button(
+            self.icc_frame,
+            text="🎨 Use Custom ICC Profile",
+            command=self.select_icc_profile,
+            font=("Helvetica", 12),
+            bg='#2a2a2a',
+            fg='#ffffff',
+            relief="solid",
+            borderwidth=2
+        )
+        self.icc_button.pack(side=tk.LEFT, padx=5)
+        
+        self.icc_label = tk.Label(
+            self.icc_frame,
+            text="(Using default PQ profile)",
+            font=("Helvetica", 10),
+            fg="#cccccc",
+            bg='#1a1a1a'
+        )
+        self.icc_label.pack(side=tk.LEFT)
+        
         # Drop zone
         self.drop_zone = tk.Label(
             self.root,
@@ -85,6 +131,16 @@ class PQConverterApp:
             bg='#1a1a1a'
         )
         self.status_label.pack(pady=10)
+        
+    def select_icc_profile(self):
+        file_path = filedialog.askopenfilename(
+            title="Select ICC Profile",
+            filetypes=[("ICC Profiles", "*.icc *.icm"), ("All files", "*.*")]
+        )
+        if file_path:
+            self.current_icc = file_path
+            self.icc_label.config(text=f"(Using: {os.path.basename(file_path)})")
+            self.icc_button.config(text="🔄 Change ICC Profile")
         
     def handle_click(self, event):
         file_path = filedialog.askopenfilename(
@@ -124,11 +180,11 @@ class PQConverterApp:
             
             # Run ImageMagick command
             cmd = [
-                "magick",
+                self.magick_path,
                 input_file,
                 "-define", "quantum:format=floating-point",
                 "-depth", "16",
-                "-profile", self.icc_profile,
+                "-profile", self.current_icc,
                 output_file
             ]
             
