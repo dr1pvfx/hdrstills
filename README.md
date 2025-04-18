@@ -10,7 +10,7 @@ Before building the application, you need to have the following installed:
 2. ImageMagick (install using Homebrew: `brew install imagemagick`)
 3. pip (Python package manager)
 
-## Building the Application
+## Building the Application on MACOS
 
 1. Install the required Python packages:
    ```bash
